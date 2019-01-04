@@ -11,9 +11,6 @@ router.register('items', views.ItemsViewSet, basename='items')
 
 app_name = 'orders'
 
-# for url in router.urls:
-#     print(url.__dict__)
-
 urlpatterns = [
     path('', include(router.urls))
 ]
