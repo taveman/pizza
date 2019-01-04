@@ -3,6 +3,8 @@ MAINTAINER Yuiry
 
 ENV PYTHONUNBUFFERED 1
 
+COPY /requirements.txt /requirements.txt
+
 RUN apk add \
     musl-dev \
     postgresql-libs \
@@ -14,6 +16,7 @@ RUN apk add --update --no-cache --virtual .build-deps \
     postgresql-dev \
     linux-headers
 
+RUN pip install -r /requirements.txt
 RUN pip install --no-binary :all: psycopg2
 
 RUN apk del --no-cache .build-deps
@@ -21,7 +24,7 @@ RUN apk del --no-cache .build-deps
 RUN mkdir /pizza
 WORKDIR /pizza
 
-COPY ["/", "/pizza"]
+COPY ["/", "/"]
 
 RUN adduser -D pizza_user
 USER pizza_user
