@@ -24,7 +24,7 @@ RUN apk del --no-cache .build-deps
 RUN mkdir /pizza
 WORKDIR /pizza
 
-COPY ["/", "/"]
+COPY ["/", "/pizza"]
 
 RUN adduser -D pizza_user
 USER pizza_user
