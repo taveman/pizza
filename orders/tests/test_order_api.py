@@ -421,8 +421,94 @@ class OrderTest(TestCase):
         order_data = {
             'customer': new_customer.id
         }
-        res = OrderTest.client.patch(OrderTest.order_url, order_data, content_type='application/json')
+        res = OrderTest.client.patch(OrderTest.order_url, json.dumps(order_data), content_type='application/json')
         self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)
 
         last_order_state = OrderTest.client.get(OrderTest.order_url)
         self.assertDictEqual(first_order_state.data, last_order_state.data)
+
+    def test_drop_order_state_from_forbidden_to_allowed(self):
+        """
+        Tests if we can change the state from Sent or Delivered back to the Canceled, Accepted or Processing.
+        Request should contain only order_state filed.
+        """
+        OrderTest.locked_order.order_state = Order.SENT
+        OrderTest.locked_order.save()
+
+        order_data = {
+            'order_state': Order.CANCELED
+        }
+        res = OrderTest.client.patch(OrderTest.order_url, json.dumps(order_data), content_type='application/json')
+
+        self.assertEqual(res.status_code, HTTP_200_OK)
+        self.assertEqual(res.data.get('order_state'), 'C')
+
+    def test_fail_drop_order_state_from_forbidden_to_allowed(self):
+        """
+        Tests if we can change the state from Sent or Delivered back to the Canceled, Accepted or Processing sending
+        other parameters in the request.
+        Request should contain only order_state filed (but it doesn't in our case).
+        """
+        OrderTest.locked_order.order_state = Order.SENT
+        OrderTest.locked_order.save()
+
+        new_customer = Customers.objects.create(
+            name='test_101',
+            age=25,
+            email='test_101@test.com',
+            gender='M',
+            phone='12331232'
+        )
+
+        order_data = {
+            'order_state': Order.CANCELED,
+            'customer': new_customer.id
+        }
+        res = OrderTest.client.patch(OrderTest.order_url, json.dumps(order_data), content_type='application/json')
+
+        self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)
+
+    def test_drop_order_state_from_forbidden_to_allowed_with_later_update(self):
+        """
+        Tests if we can change the state from Sent or Delivered back to the Canceled, Accepted or Processing. When an
+        order is in allowed state we tests if we can update order details.
+        """
+        OrderTest.locked_order.order_state = Order.SENT
+        OrderTest.locked_order.save()
+
+        new_customer = Customers.objects.create(
+            name='test_101',
+            age=25,
+            email='test_101@test.com',
+            gender='M',
+            phone='12331232'
+        )
+
+        order_custom_data = {
+            'customer': new_customer.id
+        }
+        res = OrderTest.client.patch(
+            OrderTest.order_url,
+            json.dumps(order_custom_data),
+            content_type='application/json'
+        )
+        self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)
+
+        order_state_data = {
+            'order_state': Order.PROCESSING
+        }
+        res = OrderTest.client.patch(
+            OrderTest.order_url,
+            json.dumps(order_state_data),
+            content_type='application/json'
+        )
+        self.assertEqual(res.status_code, HTTP_200_OK)
+        self.assertEqual(res.data.get('order_state'), 'P')
+
+        res = OrderTest.client.patch(
+            OrderTest.order_url,
+            json.dumps(order_custom_data),
+            content_type='application/json'
+        )
+        self.assertEqual(res.status_code, HTTP_200_OK)
+        self.assertEqual(res.data.get('customer'), new_customer.id)

@@ -33,7 +33,7 @@ class OrderUpdateSerializer(ModelSerializer):
     A special serializer for order update process. Order can't be updated if it is in states Delivered or Sent
     """
     def update(self, instance, validated_data):
-        if instance.order_state in (Order.DELIVERED, Order.SENT):
+        if validated_data.get('customer') and instance.order_state in (Order.DELIVERED, Order.SENT):
             raise ValidationError('Order can\'t be change already. It is in state: {}'.format(instance.order_state))
         instance.customer = validated_data.get('customer', instance.customer)
         instance.order_state = validated_data.get('order_state', instance.order_state)
