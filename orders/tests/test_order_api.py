@@ -141,6 +141,7 @@ def generate_pizza_sizes():
     """
     Generates pizza sizes
     :return: List of generated pizza sizes
+    :rtype: list
     """
     all_sizes = []
     for name in (PizzaSizes.SMALL, PizzaSizes.MEDIUM, PizzaSizes.LARGE, PizzaSizes.X_LARGE):
@@ -229,7 +230,6 @@ class OrderTest(TestCase):
     def test_create_order_item(self):
         """
         Tests order item creation
-        :return:
         """
         sample_order = create_sample_order(OrderTest.customer.id)
 
