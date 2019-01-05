@@ -8,8 +8,7 @@ import json
 from orders.models import Order, OrderItem
 from pizzas.models import Pizzas, PizzaSizes
 from customers.models import Customers
-from orders.serializers import OrderSerializer, OrderCreateSerializer, OrderItemSerializer, \
-                               OrderItemCreateSerializer, ItemSerializer, OrderStatusSerializer
+from orders.serializers import OrderSerializer, OrderItemCreateSerializer
 
 
 order_url = reverse('orders:orders-list')
@@ -427,9 +426,3 @@ class OrderTest(TestCase):
 
         last_order_state = OrderTest.client.get(OrderTest.order_url)
         self.assertDictEqual(first_order_state.data, last_order_state.data)
-
-    def tearDown(self):
-        """
-        Cleaning up
-        """
-        pass
