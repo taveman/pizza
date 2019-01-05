@@ -4,7 +4,9 @@ from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField, 
 
 
 class OrderSerializer(ModelSerializer):
-
+    """
+    A general serializer for Orders model
+    """
     class Meta:
         model = Order
         fields = ('id', 'customer', 'items', 'created', 'updated', 'order_state')
@@ -12,7 +14,9 @@ class OrderSerializer(ModelSerializer):
 
 
 class OrderCreateSerializer(ModelSerializer):
-
+    """
+    A special serializer for an order creation process
+    """
     def validate(self, data):
         if not data.get('customer'):
             raise ValidationError('customer field must be specified')
@@ -25,7 +29,9 @@ class OrderCreateSerializer(ModelSerializer):
 
 
 class OrderUpdateSerializer(ModelSerializer):
-
+    """
+    A special serializer for order update process. Order can't be updated if it is in states Delivered or Sent
+    """
     def update(self, instance, validated_data):
         if instance.order_state in (Order.DELIVERED, Order.SENT):
             raise ValidationError('Order can\'t be change already. It is in state: {}'.format(instance.order_state))
@@ -41,7 +47,9 @@ class OrderUpdateSerializer(ModelSerializer):
 
 
 class OrderItemSerializer(ModelSerializer):
-
+    """
+    A general Item model serializer
+    """
     class Meta:
         model = OrderItem
         fields = ('id', 'order', 'pizza_name', 'pizza_size', 'number_of_pizzas', 'is_active', 'created', 'updated')
@@ -50,7 +58,7 @@ class OrderItemSerializer(ModelSerializer):
 
 class OrderItemCreateSerializer(ModelSerializer):
     """
-    Order can only be in states Accepted or Processing
+    A special Item serializer for creation process. Order can only be in states Accepted or Processing
     """
     pizza_name = PrimaryKeyRelatedField(queryset=Pizzas.objects.filter(is_deleted=False))
     pizza_size = PrimaryKeyRelatedField(queryset=PizzaSizes.objects.filter(is_deleted=False))
@@ -63,7 +71,9 @@ class OrderItemCreateSerializer(ModelSerializer):
 
 
 class ItemSerializer(ModelSerializer):
-
+    """
+    A general Item model serializer
+    """
     class Meta:
         model = OrderItem
         fields = ('id', 'order', 'pizza_name', 'pizza_size', 'number_of_pizzas')
@@ -71,7 +81,9 @@ class ItemSerializer(ModelSerializer):
 
 
 class OrderStatusSerializer(ModelSerializer):
-
+    """
+    An order status serializer
+    """
     class Meta:
         model = Order
         fields = ('order_state', )

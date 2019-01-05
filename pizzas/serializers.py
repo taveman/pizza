@@ -3,7 +3,9 @@ from rest_framework.serializers import ModelSerializer
 
 
 class PizzaSerializer(ModelSerializer):
-
+    """
+    A Pizzas model general serializer
+    """
     class Meta:
         model = Pizzas
         fields = ('id', 'name', 'created', 'updated')
@@ -11,7 +13,9 @@ class PizzaSerializer(ModelSerializer):
 
 
 class PizzaSizeSerializer(ModelSerializer):
-
+    """
+    A PizzaSizes model general serializer
+    """
     class Meta:
         model = PizzaSizes
         fields = ('id', 'sizename', 'created', 'updated')
